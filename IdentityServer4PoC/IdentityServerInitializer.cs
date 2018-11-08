@@ -2,6 +2,7 @@
 using System.Linq;
 using Autofac;
 using IdentityServer4.Models;
+using IdentityServer4.Test;
 using IntelliFlo.AppStartup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,6 +24,7 @@ namespace IdentityServer4PoC
             services.AddIdentityServer()
                 .AddDeveloperSigningCredential()
                 .AddInMemoryApiResources(GetApiResources())
+                .AddTestUsers(GetUsers())
                 .AddInMemoryClients(GetClients());
         }
 
@@ -53,6 +55,36 @@ namespace IdentityServer4PoC
 
                     // scopes that client has access to
                     AllowedScopes = { "api1" }
+                },
+                new Client
+                {
+                    ClientId = "ro.client",
+                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+
+                    ClientSecrets =
+                    {
+                        new Secret("secret".Sha256())
+                    },
+                    AllowedScopes = { "api1" }
+                }
+            };
+        }
+
+        private static List<TestUser> GetUsers()
+        {
+            return new List<TestUser>
+            {
+                new TestUser
+                {
+                    SubjectId = "1",
+                    Username = "alice",
+                    Password = "password"
+                },
+                new TestUser
+                {
+                    SubjectId = "2",
+                    Username = "bob",
+                    Password = "password"
                 }
             };
         }

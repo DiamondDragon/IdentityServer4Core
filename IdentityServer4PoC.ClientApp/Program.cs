@@ -48,6 +48,18 @@ namespace IdentityServer4PoC.ClientApp
                 var content = await response.Content.ReadAsStringAsync();
                 Console.WriteLine(JArray.Parse(content));
             }
+
+            tokenClient = new TokenClient(disco.TokenEndpoint, "ro.client", "secret");
+            tokenResponse = await tokenClient.RequestResourceOwnerPasswordAsync("alice", "password", "api1");
+
+            if (tokenResponse.IsError)
+            {
+                Console.WriteLine(tokenResponse.Error);
+                return;
+            }
+
+            Console.WriteLine(tokenResponse.Json);
+            Console.WriteLine("\n\n");
         }
     }
 }
