@@ -25,6 +25,7 @@ namespace IdentityServer4PoC
             yield return new NHibernateInitializer(Configuration);
             //yield return new EntityFrameworkInitializer<PlatformerDbContext>(Configuration);
             yield return new BusInitializer(Configuration);
+            yield return new IdentityServerInitializer();
         }
 
         protected override IEnumerable<Module> CreateAutofacModules()
