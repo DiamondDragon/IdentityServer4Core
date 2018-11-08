@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using IdentityModel.Client;
+using Newtonsoft.Json.Linq;
 
 namespace IdentityServer4PoC.ClientApp
 {
@@ -32,6 +34,20 @@ namespace IdentityServer4PoC.ClientApp
             }
 
             Console.WriteLine(tokenResponse.Json);
+
+            var client = new HttpClient();
+            client.SetBearerToken(tokenResponse.AccessToken);
+
+            var response = await client.GetAsync("http://localhost:9999/identity");
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine(response.StatusCode);
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(JArray.Parse(content));
+            }
         }
     }
 }
