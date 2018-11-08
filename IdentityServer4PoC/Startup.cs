@@ -1,34 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.Collections.Generic;
+using Autofac;
+using IntelliFlo.AppStartup;
+using IntelliFlo.AppStartup.Initializers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace IdentityServer4PoC
 {
-    public class Startup
+    internal class Startup : MicroserviceStartup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        public Startup(ILoggerFactory loggerFactory, IConfiguration configuration)
+            : base(loggerFactory, configuration)
         {
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        protected override IEnumerable<IMicroserviceInitializer> CreateInitializers()
         {
-            if (env.IsDevelopment())
+            foreach (var initializer in base.CreateInitializers())
             {
-                app.UseDeveloperExceptionPage();
+                yield return initializer;
             }
 
-            app.Run(async (context) =>
+            yield return new DatabaseInitializer(Configuration);
+            yield return new NHibernateInitializer(Configuration);
+            //yield return new EntityFrameworkInitializer<PlatformerDbContext>(Configuration);
+            yield return new BusInitializer(Configuration);
+        }
+
+        protected override IEnumerable<Module> CreateAutofacModules()
+        {
+            foreach (var module in base.CreateAutofacModules())
             {
-                await context.Response.WriteAsync("Hello World!");
-            });
+                yield return module;
+            }
+
+            //yield return new BulkApiAutofacModule();
+            //yield return new BulkAutofacModule();
+            //yield return new BulkBusAutofacModule();
         }
     }
 }

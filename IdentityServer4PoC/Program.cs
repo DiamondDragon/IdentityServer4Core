@@ -1,24 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using IntelliFlo;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Hosting.WindowsServices;
 
 namespace IdentityServer4PoC
 {
-    public class Program
+    class Program
     {
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var host = BuildWebHost(args);
+
+            if (MicroserviceHost.ShouldRunAsService(args))
+                host.RunAsService();
+            else
+                host.Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        /// <summary>
+        /// It's important to have this methods defined as follows in order to prevent issues with EF
+        /// migrations https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation
+        /// </summary>
+        public static IWebHost BuildWebHost(string[] args) => MicroserviceHost
+            .Build<Startup>(args);
     }
 }
