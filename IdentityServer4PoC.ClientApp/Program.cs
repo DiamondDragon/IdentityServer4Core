@@ -14,7 +14,7 @@ namespace IdentityServer4PoC.ClientApp
 
         private static async Task DoDemoAsync()
         {
-            var disco = await DiscoveryClient.GetAsync("http://localhost:5000");
+            var disco = await DiscoveryClient.GetAsync("http://localhost:8888");
             if (disco.IsError)
             {
                 Console.WriteLine(disco.Error);
